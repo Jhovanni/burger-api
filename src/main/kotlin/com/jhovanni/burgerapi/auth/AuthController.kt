@@ -1,6 +1,6 @@
 package com.jhovanni.burgerapi
 
-import com.jhovanni.burgerapi.auth.TokenService
+import com.jhovanni.burgerapi.auth.AuthService
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -10,11 +10,11 @@ import javax.validation.constraints.NotBlank
 
 @RestController
 @RequestMapping("/api/v1/auth")
-class AuthController(private val tokenService: TokenService) {
+class AuthController(private val authService: AuthService) {
 
     @PostMapping
     fun postAuth(@Valid @RequestBody request: AuthRequest): AuthResponse {
-        val token = tokenService.generate(request.email, listOf("ADMIN"))
+        val token = authService.authenticate(request.email, request.password)
         return AuthResponse(token)
     }
 }

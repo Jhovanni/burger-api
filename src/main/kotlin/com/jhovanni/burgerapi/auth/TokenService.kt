@@ -8,8 +8,8 @@ import java.util.*
 
 @Component
 class TokenService {
-    @Value("security.jwt.secret")
-    private lateinit var secret: String
+    @Value("\${security.jwt.secret.key}")
+    private lateinit var secretKey: String
     fun generate(subject: String, roles: List<String>): String {
         return Jwts
             .builder()
@@ -17,7 +17,7 @@ class TokenService {
             .setSubject(subject)
             .setIssuedAt(Date(System.currentTimeMillis()))
             .setExpiration(Date(System.currentTimeMillis() + 600000))
-            .signWith(SignatureAlgorithm.HS512, secret)
+            .signWith(SignatureAlgorithm.HS512, secretKey)
             .compact()
     }
 }

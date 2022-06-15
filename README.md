@@ -6,4 +6,6 @@ It follows (mostly) the contracts described in https://laboratoria.github.io/bur
 Deployment
 The application is deployed to Heroku. For it to work it requires to files: Procfile and system.properties.
 
+### Swagger
+Base swagger URL is localhost:8080/swagger-ui (for local deployment)
 

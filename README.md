@@ -7,5 +7,5 @@ Deployment
 The application is deployed to Heroku. For it to work it requires to files: Procfile and system.properties.
 
 ### Swagger
-Base swagger URL is localhost:8080/swagger-ui (for local deployment)
+Base swagger URL is http://localhost:8080/swagger-ui.html (for local deployment)
 

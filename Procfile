@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -jar target/burger-api-0.0.1-SNAPSHOT.jar
+web: java --server.port=$PORT -jar build/libs/kotlin-api.jar

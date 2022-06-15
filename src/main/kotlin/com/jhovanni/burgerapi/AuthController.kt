@@ -9,7 +9,7 @@ import javax.validation.Valid
 import javax.validation.constraints.NotBlank
 
 @RestController
-@RequestMapping("/v1/auth")
+@RequestMapping("/api/v1/auth")
 class AuthController(private val tokenService: TokenService) {
 
     @PostMapping

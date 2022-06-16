@@ -1,3 +1,5 @@
 package com.jhovanni.burgerapi.users
 
-data class User(val email: String, val password: String, val roles: List<String>)
+import java.util.UUID
+
+data class User(val uuid: UUID, val email: String, val password: String, val roles: List<String>)

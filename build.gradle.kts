@@ -19,6 +19,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.security:spring-security-crypto:5.7.1")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("io.jsonwebtoken:jjwt:0.9.1")
@@ -27,6 +28,7 @@ dependencies {
 	implementation("org.postgresql:postgresql")
 	implementation("org.springdoc:springdoc-openapi-data-rest:1.6.9")
 	implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
+	implementation("org.springdoc:springdoc-openapi-kotlin:1.6.9")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }

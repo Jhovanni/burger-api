@@ -26,7 +26,8 @@ class AuthService(
 
     fun authenticate(email: String, password: String): String {
         val user = getUser(email, password)
-        return tokenService.generate(user.email, user.roles)
+        val credentials = UserCredentials(user.uuid.toString(), user.roles)
+        return tokenService.generate(credentials)
     }
 
     private fun getUser(email: String, password: String): User {

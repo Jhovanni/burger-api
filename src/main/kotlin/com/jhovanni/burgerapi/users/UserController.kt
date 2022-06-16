@@ -5,15 +5,11 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
-import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.stereotype.Service
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ResponseStatusException
 import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
@@ -40,6 +36,7 @@ class UserController(private val userService: UserService) {
         )
     )
     @PutMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     fun createUSer(@Valid @RequestBody request: CreateUserRequest): CreateUserResponse {
         val user = userService.createUser(request.email, request.password, request.roles.orEmpty())
         return CreateUserResponse(user.uuid, user.email, user.roles)
@@ -54,14 +51,3 @@ data class CreateUserRequest(
 
 data class CreateUserResponse(val userUuid: UUID, val email: String, val roles: List<String>)
 
-@Service
-class UserService(private val userRepository: UserRepository, private val passwordEncoder: PasswordEncoder) {
-    @Value("\${user.admin.email}")
-    private lateinit var adminEmail: String
-    fun createUser(email: String, password: String, roles: List<String>): User {
-        if (email == adminEmail || userRepository.exists(email)) {
-            throw ResponseStatusException(HttpStatus.CONFLICT)
-        }
-        return userRepository.create(User(UUID.randomUUID(), email, passwordEncoder.encode(password), roles))
-    }
-}

@@ -4,14 +4,17 @@ import com.jhovanni.burgerapi.users.User
 import com.jhovanni.burgerapi.users.UserRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import java.util.UUID
-
-private const val s = "admin@admin.com"
+import java.util.*
 
 @Service
-class AuthService(private val userRepository: UserRepository, private val tokenService: TokenService) {
+class AuthService(
+    private val userRepository: UserRepository,
+    private val tokenService: TokenService,
+    private val passwordEncoder: PasswordEncoder
+) {
     @Value("\${user.admin.uuid}")
     private lateinit var adminUuid: UUID
 
@@ -32,7 +35,7 @@ class AuthService(private val userRepository: UserRepository, private val tokenS
         }
 
         val user = userRepository.findUser(email) ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
-        if (user.password != password) {
+        if (!passwordEncoder.matches(password, user.password)) {
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         }
         return user

@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.responses.ApiResponses
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -15,18 +15,26 @@ import javax.validation.constraints.NotBlank
 @RestController
 @RequestMapping("/api/v1/users")
 class UserController(private val userService: UserService) {
-    @Operation(summary = "Get all users")
-    @ApiResponses(
-        ApiResponse(
-            responseCode = "200",
-            description = "Success",
-            content = [(Content(
-                mediaType = "application/json",
-                array = ArraySchema(schema = Schema(implementation = UsersResponse::class))
-            ))]
-        ),
-        ApiResponse(responseCode = "401", description = "Unauthenticated", content = [Content()]),
-        ApiResponse(responseCode = "403", description = "Forbidden", content = [Content()]),
+
+    @Operation(
+        summary = "Get users", security = [SecurityRequirement(name = "Bearer JWT")],
+        description = "Requires an admin user",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Success",
+                content = [(Content(
+                    mediaType = "application/json",
+                    array = ArraySchema(schema = Schema(implementation = UsersResponse::class))
+                ))]
+            ),
+            ApiResponse(responseCode = "401", description = "Missing authentication", content = [Content()]),
+            ApiResponse(
+                responseCode = "403",
+                description = "User not allowed to perform the operation",
+                content = [Content()]
+            )
+        ]
     )
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -34,19 +42,26 @@ class UserController(private val userService: UserService) {
         return UsersResponse(userService.getUsers())
     }
 
-    @Operation(summary = "Get a single user")
-    @ApiResponses(
-        ApiResponse(
-            responseCode = "200",
-            description = "Success",
-            content = [(Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = UserResponse::class)
-            ))]
-        ),
-        ApiResponse(responseCode = "401", description = "Unauthenticated", content = [Content()]),
-        ApiResponse(responseCode = "403", description = "Forbidden", content = [Content()]),
-        ApiResponse(responseCode = "404", description = "User not found", content = [Content()]),
+    @Operation(
+        summary = "Get user", security = [SecurityRequirement(name = "Bearer JWT")],
+        description = "Requires an admin user or be the user owner",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "Success",
+                content = [(Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = UserResponse::class)
+                ))]
+            ),
+            ApiResponse(responseCode = "401", description = "Missing authentication", content = [Content()]),
+            ApiResponse(
+                responseCode = "403",
+                description = "User not allowed to perform the operation",
+                content = [Content()]
+            ),
+            ApiResponse(responseCode = "404", description = "User not found", content = [Content()]),
+        ]
     )
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -54,24 +69,31 @@ class UserController(private val userService: UserService) {
         return UserResponse(userService.getUser(id))
     }
 
-    @Operation(summary = "Creates a new user")
-    @ApiResponses(
-        ApiResponse(
-            responseCode = "200",
-            description = "User created",
-            content = [(Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = UserResponse::class)
-            ))]
-        ),
-        ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
-        ApiResponse(responseCode = "401", description = "Unauthenticated", content = [Content()]),
-        ApiResponse(responseCode = "403", description = "Forbidden", content = [Content()]),
-        ApiResponse(
-            responseCode = "409",
-            description = "User with the given email already exists",
-            content = [Content()]
-        )
+    @Operation(
+        summary = "Create user", security = [SecurityRequirement(name = "Bearer JWT")],
+        description = "Requires an admin user",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "User created",
+                content = [(Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = UserResponse::class)
+                ))]
+            ),
+            ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
+            ApiResponse(responseCode = "401", description = "Missing authentication", content = [Content()]),
+            ApiResponse(
+                responseCode = "403",
+                description = "User not allowed to perform the operation",
+                content = [Content()]
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "User with the given email already exists",
+                content = [Content()]
+            )
+        ]
     )
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -80,20 +102,27 @@ class UserController(private val userService: UserService) {
         return UserResponse(user)
     }
 
-    @Operation(summary = "Updates an user")
-    @ApiResponses(
-        ApiResponse(
-            responseCode = "200",
-            description = "User data updated",
-            content = [(Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = UserResponse::class)
-            ))]
-        ),
-        ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
-        ApiResponse(responseCode = "401", description = "Unauthenticated", content = [Content()]),
-        ApiResponse(responseCode = "403", description = "Forbidden", content = [Content()]),
-        ApiResponse(responseCode = "404", description = "User does not exists", content = [Content()]),
+    @Operation(
+        summary = "Update user", security = [SecurityRequirement(name = "Bearer JWT")],
+        description = "Requires an admin user or be the user owner",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "User data updated",
+                content = [(Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = UserResponse::class)
+                ))]
+            ),
+            ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
+            ApiResponse(responseCode = "401", description = "Missing authentication", content = [Content()]),
+            ApiResponse(
+                responseCode = "403",
+                description = "User not allowed to perform the operation",
+                content = [Content()]
+            ),
+            ApiResponse(responseCode = "404", description = "User does not exists", content = [Content()]),
+        ]
     )
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -105,20 +134,18 @@ class UserController(private val userService: UserService) {
         return UserResponse(user)
     }
 
-    @Operation(summary = "Deletes an user")
-    @ApiResponses(
-        ApiResponse(
-            responseCode = "200",
-            description = "Success",
-            content = [(Content(
-                mediaType = "application/json",
-                schema = Schema(implementation = UserResponse::class)
-            ))]
-        ),
-        ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
-        ApiResponse(responseCode = "401", description = "Unauthenticated", content = [Content()]),
-        ApiResponse(responseCode = "403", description = "Forbidden", content = [Content()]),
-        ApiResponse(responseCode = "404", description = "User does not exists", content = [Content()]),
+    @Operation(
+        summary = "Delete user", security = [SecurityRequirement(name = "Bearer JWT")],
+        description = "Requires an admin user or be the user owner",
+        responses = [
+            ApiResponse(responseCode = "401", description = "Missing authentication", content = [Content()]),
+            ApiResponse(
+                responseCode = "403",
+                description = "User not allowed to perform the operation",
+                content = [Content()]
+            ),
+            ApiResponse(responseCode = "404", description = "User does not exists", content = [Content()]),
+        ]
     )
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")

@@ -20,7 +20,6 @@ class UserRepository(private val userJpaRepository: UserJpaRepository) {
     private fun mapToUser(userJpa: UserJpa) = User(
         requireNotNull(userJpa.id),
         requireNotNull(userJpa.email),
-        requireNotNull(userJpa.password),
         requireNotNull(userJpa.roles)
     )
 
@@ -32,11 +31,11 @@ class UserRepository(private val userJpaRepository: UserJpaRepository) {
         return userJpaRepository.existsById(id)
     }
 
-    fun save(user: User): User {
+    fun save(user: User, encodedPassword: String): User {
         val userJpa = UserJpa()
         userJpa.id = user.id
         userJpa.email = user.email
-        userJpa.password = user.password
+        userJpa.encodedPassword = encodedPassword
         userJpa.roles = user.roles
         userJpaRepository.save(userJpa)
         return user
@@ -51,11 +50,18 @@ class UserRepository(private val userJpaRepository: UserJpaRepository) {
         userJpaRepository.delete(userJpa)
         return mapToUser(userJpa)
     }
+
+    fun getEncodedPassword(id: UUID): String? {
+        return userJpaRepository.getEncodedPasswordById(id)
+    }
 }
 
 interface UserJpaRepository : JpaRepository<UserJpa, UUID> {
     fun findOneByEmail(email: String): Optional<UserJpa>
     fun existsByEmail(email: String): Boolean
+
+    @org.springframework.data.jpa.repository.Query("SELECT encodedPassword FROM UserJpa WHERE  id = :id")
+    fun getEncodedPasswordById(id: UUID): String?
 }
 
 @Entity
@@ -71,7 +77,7 @@ open class UserJpa {
 
     @get:Column
     @get:NotNull
-    open var password: String? = null
+    open var encodedPassword: String? = null
 
     @get:Column
     @get:ElementCollection

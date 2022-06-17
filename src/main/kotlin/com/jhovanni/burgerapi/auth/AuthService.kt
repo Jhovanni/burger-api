@@ -32,11 +32,12 @@ class AuthService(
 
     private fun getUser(email: String, password: String): User {
         if (email == adminEmail && password == adminPassword) {
-            return User(adminUuid, email, password, listOf("ADMIN"))
+            return User(adminUuid, email, listOf("ADMIN"))
         }
 
         val user = userRepository.findUser(email) ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
-        if (!passwordEncoder.matches(password, user.password)) {
+        val encodedPassword = userRepository.getEncodedPassword(user.id)
+        if (!passwordEncoder.matches(password, encodedPassword)) {
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         }
         return user

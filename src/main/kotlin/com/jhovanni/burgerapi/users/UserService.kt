@@ -15,7 +15,7 @@ class UserService(private val userRepository: UserRepository, private val passwo
         if (email == adminEmail || userRepository.exists(email)) {
             throw ResponseStatusException(HttpStatus.CONFLICT)
         }
-        return userRepository.save(User(UUID.randomUUID(), email, passwordEncoder.encode(password), roles))
+        return userRepository.save(User(UUID.randomUUID(), email, roles), passwordEncoder.encode(password))
     }
 
     fun updateUser(id: UUID, email: String, password: String, roles: List<String>): User {
@@ -25,7 +25,7 @@ class UserService(private val userRepository: UserRepository, private val passwo
         if (userRepository.exists(id)) {
             throw ResponseStatusException(HttpStatus.NOT_FOUND)
         }
-        return userRepository.save(User(id, email, passwordEncoder.encode(password), roles))
+        return userRepository.save(User(id, email, roles), passwordEncoder.encode(password))
     }
 
     fun getUsers(): List<User> {

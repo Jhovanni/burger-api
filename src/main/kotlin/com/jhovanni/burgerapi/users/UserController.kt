@@ -80,7 +80,7 @@ class UserController(private val userService: UserService) {
         return CreateUserResponse(user)
     }
 
-    @Operation(summary = "Updates user")
+    @Operation(summary = "Updates an user")
     @ApiResponses(
         ApiResponse(
             responseCode = "200",

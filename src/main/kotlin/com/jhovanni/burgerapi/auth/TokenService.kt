@@ -32,7 +32,8 @@ class TokenService {
     fun extract(jwtToken: String): UserCredentials? {
         return try {
             val claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken).body
-            val roles = claims[ROLES_KEY].toString().split(ROLES_DELIMITER).toList()
+            val roles =
+                claims[ROLES_KEY].toString().split(ROLES_DELIMITER).toList().filter(String::isNotBlank)
             UserCredentials(claims.subject, roles)
         } catch (e: ExpiredJwtException) {
             null

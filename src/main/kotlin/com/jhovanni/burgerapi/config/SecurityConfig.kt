@@ -78,12 +78,8 @@ class JwtFilter(private val tokenService: TokenService) : OncePerRequestFilter()
         credentials: UserCredentials,
         request: HttpServletRequest
     ) {
-        val usernamePasswordAuthenticationToken =
-            UsernamePasswordAuthenticationToken(
-                credentials,
-                null,
-                credentials.roles.map { role -> SimpleGrantedAuthority(role) }
-            )
+        val authorities = credentials.roles.map(::SimpleGrantedAuthority)
+        val usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(credentials, null, authorities)
         usernamePasswordAuthenticationToken.details = WebAuthenticationDetailsSource().buildDetails(request)
         SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
     }

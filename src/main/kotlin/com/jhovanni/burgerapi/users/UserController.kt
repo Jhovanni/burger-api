@@ -15,6 +15,38 @@ import javax.validation.constraints.NotBlank
 @RestController
 @RequestMapping("/api/v1/users")
 class UserController(private val userService: UserService) {
+    @Operation(
+        summary = "Create user", security = [SecurityRequirement(name = "Bearer JWT")],
+        description = "Requires an admin user",
+        responses = [
+            ApiResponse(
+                responseCode = "200",
+                description = "User created",
+                content = [(Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = UserResponse::class)
+                ))]
+            ),
+            ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
+            ApiResponse(responseCode = "401", description = "Missing authentication", content = [Content()]),
+            ApiResponse(
+                responseCode = "403",
+                description = "User not allowed to perform the operation",
+                content = [Content()]
+            ),
+            ApiResponse(
+                responseCode = "409",
+                description = "User with the given email already exists",
+                content = [Content()]
+            )
+        ]
+    )
+    @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    fun createUSer(@Valid @RequestBody request: UserRequest): UserResponse {
+        val user = userService.createUser(request.email, request.password, request.roles.orEmpty())
+        return UserResponse(user)
+    }
 
     @Operation(
         summary = "Get users", security = [SecurityRequirement(name = "Bearer JWT")],
@@ -64,42 +96,9 @@ class UserController(private val userService: UserService) {
         ]
     )
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') || #id.toString() == authentication.principal.subject")
     fun getUser(@PathVariable id: UUID): UserResponse {
         return UserResponse(userService.getUser(id))
-    }
-
-    @Operation(
-        summary = "Create user", security = [SecurityRequirement(name = "Bearer JWT")],
-        description = "Requires an admin user",
-        responses = [
-            ApiResponse(
-                responseCode = "200",
-                description = "User created",
-                content = [(Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = UserResponse::class)
-                ))]
-            ),
-            ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
-            ApiResponse(responseCode = "401", description = "Missing authentication", content = [Content()]),
-            ApiResponse(
-                responseCode = "403",
-                description = "User not allowed to perform the operation",
-                content = [Content()]
-            ),
-            ApiResponse(
-                responseCode = "409",
-                description = "User with the given email already exists",
-                content = [Content()]
-            )
-        ]
-    )
-    @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    fun createUSer(@Valid @RequestBody request: UserRequest): UserResponse {
-        val user = userService.createUser(request.email, request.password, request.roles.orEmpty())
-        return UserResponse(user)
     }
 
     @Operation(
@@ -125,7 +124,7 @@ class UserController(private val userService: UserService) {
         ]
     )
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') || #id.toString() == authentication.principal.subject")
     fun updateUser(
         @PathVariable id: UUID,
         @Valid @RequestBody request: UserRequest
@@ -148,7 +147,7 @@ class UserController(private val userService: UserService) {
         ]
     )
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN') || #id.toString() == authentication.principal.subject")
     fun deleteUser(@PathVariable id: UUID): UserResponse {
         val user = userService.deleteUser(id)
         return UserResponse(user)

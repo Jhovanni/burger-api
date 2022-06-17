@@ -15,6 +15,28 @@ class UserService(private val userRepository: UserRepository, private val passwo
         if (email == adminEmail || userRepository.exists(email)) {
             throw ResponseStatusException(HttpStatus.CONFLICT)
         }
-        return userRepository.create(User(UUID.randomUUID(), email, passwordEncoder.encode(password), roles))
+        return userRepository.save(User(UUID.randomUUID(), email, passwordEncoder.encode(password), roles))
+    }
+
+    fun updateUser(id: UUID, email: String, password: String, roles: List<String>): User {
+        if (email == adminEmail || userRepository.exists(email)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT)
+        }
+        if (userRepository.exists(id)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+        return userRepository.save(User(id, email, passwordEncoder.encode(password), roles))
+    }
+
+    fun getUsers(): List<User> {
+        return userRepository.getAll()
+    }
+
+    fun getUser(id: UUID): User {
+        return userRepository.findUser(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    }
+
+    fun deleteUser(id: UUID): User {
+        return userRepository.delete(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
 }

@@ -37,6 +37,7 @@ class SecurityConfig {
         http.csrf().disable()
             .authorizeRequests()
             .antMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
+            .antMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .anyRequest().authenticated()
             .and().exceptionHandling().authenticationEntryPoint(UnauthorizedEntryPoint())
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)

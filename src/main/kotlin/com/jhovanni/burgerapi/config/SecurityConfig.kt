@@ -4,6 +4,7 @@ import com.jhovanni.burgerapi.auth.TokenService
 import com.jhovanni.burgerapi.auth.UserCredentials
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -34,7 +35,9 @@ class SecurityConfig {
     @Bean
     fun filterChain(http: HttpSecurity, jwtFilter: JwtFilter): SecurityFilterChain {
         http.csrf().disable()
-            .authorizeRequests().anyRequest().permitAll()
+            .authorizeRequests()
+            .antMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
+            .anyRequest().authenticated()
             .and().exceptionHandling().authenticationEntryPoint(UnauthorizedEntryPoint())
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
         return http.build()

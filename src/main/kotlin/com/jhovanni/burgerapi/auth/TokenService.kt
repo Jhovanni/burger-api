@@ -21,7 +21,7 @@ class TokenService {
         val expirationMs = issuedMs + TOKEN_LIFE_MS
         return Jwts
             .builder()
-            .setSubject(userCredentials.subject)
+            .setSubject(userCredentials.id.toString())
             .claim(ROLES_KEY, userCredentials.roles.joinToString(ROLES_DELIMITER))
             .setIssuedAt(Date(issuedMs))
             .setExpiration(Date(expirationMs))
@@ -34,7 +34,7 @@ class TokenService {
             val claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken).body
             val roles =
                 claims[ROLES_KEY].toString().split(ROLES_DELIMITER).toList().filter(String::isNotBlank)
-            UserCredentials(claims.subject, roles)
+            UserCredentials(UUID.fromString(claims.subject), roles)
         } catch (e: ExpiredJwtException) {
             null
         }
@@ -42,4 +42,4 @@ class TokenService {
 
 }
 
-data class UserCredentials(val subject: String, val roles: List<String>)
+data class UserCredentials(val id: UUID, val roles: List<String>)

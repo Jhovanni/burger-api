@@ -96,7 +96,7 @@ class UserController(private val userService: UserService) {
         ]
     )
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') || #id.toString() == authentication.principal.subject")
+    @PreAuthorize("hasAuthority('ADMIN') || #id == authentication.principal.id")
     fun getUser(@PathVariable id: UUID): UserResponse {
         return UserResponse(userService.getUser(id))
     }
@@ -124,7 +124,7 @@ class UserController(private val userService: UserService) {
         ]
     )
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') || #id.toString() == authentication.principal.subject")
+    @PreAuthorize("hasAuthority('ADMIN') || #id == authentication.principal.id")
     fun updateUser(
         @PathVariable id: UUID,
         @Valid @RequestBody request: UserRequest
@@ -147,7 +147,7 @@ class UserController(private val userService: UserService) {
         ]
     )
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN') || #id.toString() == authentication.principal.subject")
+    @PreAuthorize("hasAuthority('ADMIN') || #id == authentication.principal.id")
     fun deleteUser(@PathVariable id: UUID): UserResponse {
         val user = userService.deleteUser(id)
         return UserResponse(user)

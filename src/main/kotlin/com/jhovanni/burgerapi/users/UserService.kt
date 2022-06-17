@@ -19,11 +19,12 @@ class UserService(private val userRepository: UserRepository, private val passwo
     }
 
     fun updateUser(id: UUID, email: String, password: String, roles: List<String>): User {
-        if (email == adminEmail || userRepository.exists(email)) {
+        if (email == adminEmail) {
             throw ResponseStatusException(HttpStatus.CONFLICT)
         }
-        if (userRepository.exists(id)) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        val user = userRepository.findUser(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        if (email != user.email && userRepository.exists(email)) {
+            throw ResponseStatusException(HttpStatus.CONFLICT)
         }
         return userRepository.save(User(id, email, roles), passwordEncoder.encode(password))
     }

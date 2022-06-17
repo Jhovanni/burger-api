@@ -22,7 +22,7 @@ class UserController(private val userService: UserService) {
             description = "Success",
             content = [(Content(
                 mediaType = "application/json",
-                array = ArraySchema(schema = Schema(implementation = CreateUserResponse::class))
+                array = ArraySchema(schema = Schema(implementation = UsersResponse::class))
             ))]
         ),
         ApiResponse(responseCode = "401", description = "Unauthenticated", content = [Content()]),
@@ -30,8 +30,8 @@ class UserController(private val userService: UserService) {
     )
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    fun getUsers(): GetUsersResponse {
-        return GetUsersResponse(userService.getUsers())
+    fun getUsers(): UsersResponse {
+        return UsersResponse(userService.getUsers())
     }
 
     @Operation(summary = "Get a single user")
@@ -41,7 +41,7 @@ class UserController(private val userService: UserService) {
             description = "Success",
             content = [(Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = CreateUserResponse::class)
+                schema = Schema(implementation = UserResponse::class)
             ))]
         ),
         ApiResponse(responseCode = "401", description = "Unauthenticated", content = [Content()]),
@@ -50,8 +50,8 @@ class UserController(private val userService: UserService) {
     )
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    fun getUser(@PathVariable id: UUID): GetUserResponse {
-        return GetUserResponse(userService.getUser(id))
+    fun getUser(@PathVariable id: UUID): UserResponse {
+        return UserResponse(userService.getUser(id))
     }
 
     @Operation(summary = "Creates a new user")
@@ -61,7 +61,7 @@ class UserController(private val userService: UserService) {
             description = "User created",
             content = [(Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = CreateUserResponse::class)
+                schema = Schema(implementation = UserResponse::class)
             ))]
         ),
         ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
@@ -75,9 +75,9 @@ class UserController(private val userService: UserService) {
     )
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    fun createUSer(@Valid @RequestBody request: CreateUserRequest): CreateUserResponse {
+    fun createUSer(@Valid @RequestBody request: UserRequest): UserResponse {
         val user = userService.createUser(request.email, request.password, request.roles.orEmpty())
-        return CreateUserResponse(user)
+        return UserResponse(user)
     }
 
     @Operation(summary = "Updates an user")
@@ -87,7 +87,7 @@ class UserController(private val userService: UserService) {
             description = "User data updated",
             content = [(Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = CreateUserResponse::class)
+                schema = Schema(implementation = UserResponse::class)
             ))]
         ),
         ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
@@ -99,10 +99,10 @@ class UserController(private val userService: UserService) {
     @PreAuthorize("hasAuthority('ADMIN')")
     fun updateUser(
         @PathVariable id: UUID,
-        @Valid @RequestBody request: UpdateUserRequest
-    ): UpdateUserResponse {
+        @Valid @RequestBody request: UserRequest
+    ): UserResponse {
         val user = userService.updateUser(id, request.email, request.password, request.roles.orEmpty())
-        return UpdateUserResponse(user)
+        return UserResponse(user)
     }
 
     @Operation(summary = "Deletes an user")
@@ -112,7 +112,7 @@ class UserController(private val userService: UserService) {
             description = "Success",
             content = [(Content(
                 mediaType = "application/json",
-                schema = Schema(implementation = DeleteUserResponse::class)
+                schema = Schema(implementation = UserResponse::class)
             ))]
         ),
         ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
@@ -122,28 +122,18 @@ class UserController(private val userService: UserService) {
     )
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    fun deleteUser(@PathVariable id: UUID): UpdateUserResponse {
+    fun deleteUser(@PathVariable id: UUID): UserResponse {
         val user = userService.deleteUser(id)
-        return UpdateUserResponse(user)
+        return UserResponse(user)
     }
 }
 
-data class CreateUserRequest(
+data class UserRequest(
     @field:NotBlank val email: String,
     @field:NotBlank val password: String,
     val roles: List<String>?
 )
 
-data class CreateUserResponse(val user: User)
-data class GetUsersResponse(val users: List<User>)
-data class GetUserResponse(val user: User)
-
-data class UpdateUserRequest(
-    @field:NotBlank val email: String,
-    @field:NotBlank val password: String,
-    val roles: List<String>?
-)
-
-data class UpdateUserResponse(val user: User)
-data class DeleteUserResponse(val user: User)
+data class UserResponse(val user: User)
+data class UsersResponse(val users: List<User>)
 

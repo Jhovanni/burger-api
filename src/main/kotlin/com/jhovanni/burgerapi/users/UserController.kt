@@ -1,13 +1,18 @@
 package com.jhovanni.burgerapi.users
 
+import com.jhovanni.burgerapi.auth.UserCredentials
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
+import java.security.Principal
 import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
@@ -98,12 +103,13 @@ class UserController(private val userService: UserService) {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') || #id == authentication.principal.id")
     fun getUser(@PathVariable id: UUID): UserResponse {
+        //TODO: id should be email as well, not only UUID
         return UserResponse(userService.getUser(id))
     }
 
     @Operation(
         summary = "Update user", security = [SecurityRequirement(name = "Bearer JWT")],
-        description = "Requires an admin user or be the user owner",
+        description = "Requires an admin user or be the user owner. Only admin user can update modifying roles",
         responses = [
             ApiResponse(
                 responseCode = "200",
@@ -127,10 +133,28 @@ class UserController(private val userService: UserService) {
     @PreAuthorize("hasAuthority('ADMIN') || #id == authentication.principal.id")
     fun updateUser(
         @PathVariable id: UUID,
-        @Valid @RequestBody request: UserRequest
+        @Valid @RequestBody request: UserRequest, principal: Principal
     ): UserResponse {
+        val credentials = getCredentials(principal)
+        if (!credentials.roles.contains("ADMIN") && credentials.roles != request.roles.orEmpty()) {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+        }
+
         val user = userService.updateUser(id, request.email, request.password, request.roles.orEmpty())
         return UserResponse(user)
+    }
+
+    private fun getCredentials(principal: Principal): UserCredentials {
+        if (principal is Authentication) {
+            val innerPrincipal = principal.principal
+            if (innerPrincipal is UserCredentials) {
+                return innerPrincipal
+            } else {
+                throw ResponseStatusException(HttpStatus.FORBIDDEN)
+            }
+        } else {
+            throw ResponseStatusException(HttpStatus.FORBIDDEN)
+        }
     }
 
     @Operation(

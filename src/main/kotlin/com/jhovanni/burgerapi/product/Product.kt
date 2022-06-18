@@ -10,7 +10,3 @@ data class Product(
     val type: String?,
     val created: Date
 )
-
-enum class ProductType {
-
-}

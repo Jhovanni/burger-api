@@ -48,8 +48,8 @@ class UserController(private val userService: UserService) {
     )
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    fun createUSer(@Valid @RequestBody request: UserRequest): UserResponse {
-        val user = userService.createUser(request.email, request.password, request.roles.orEmpty())
+    fun create(@Valid @RequestBody request: UserRequest): UserResponse {
+        val user = userService.create(request.email, request.password, request.roles.orEmpty())
         return UserResponse(user)
     }
 
@@ -75,8 +75,8 @@ class UserController(private val userService: UserService) {
     )
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    fun getUsers(): UsersResponse {
-        return UsersResponse(userService.getUsers())
+    fun getAll(): UsersResponse {
+        return UsersResponse(userService.getAll())
     }
 
     @Operation(
@@ -102,9 +102,9 @@ class UserController(private val userService: UserService) {
     )
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') || #id == authentication.principal.id")
-    fun getUser(@PathVariable id: UUID): UserResponse {
+    fun get(@PathVariable id: UUID): UserResponse {
         //TODO: id should be email as well, not only UUID
-        return UserResponse(userService.getUser(id))
+        return UserResponse(userService.get(id))
     }
 
     @Operation(
@@ -131,7 +131,7 @@ class UserController(private val userService: UserService) {
     )
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') || #id == authentication.principal.id")
-    fun updateUser(
+    fun update(
         @PathVariable id: UUID,
         @Valid @RequestBody request: UserRequest, principal: Principal
     ): UserResponse {
@@ -140,7 +140,7 @@ class UserController(private val userService: UserService) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
-        val user = userService.updateUser(id, request.email, request.password, request.roles.orEmpty())
+        val user = userService.update(id, request.email, request.password, request.roles.orEmpty())
         return UserResponse(user)
     }
 
@@ -172,8 +172,8 @@ class UserController(private val userService: UserService) {
     )
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN') || #id == authentication.principal.id")
-    fun deleteUser(@PathVariable id: UUID): UserResponse {
-        val user = userService.deleteUser(id)
+    fun delete(@PathVariable id: UUID): UserResponse {
+        val user = userService.delete(id)
         return UserResponse(user)
     }
 }

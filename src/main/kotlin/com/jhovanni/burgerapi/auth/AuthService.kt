@@ -35,8 +35,8 @@ class AuthService(
             return User(adminUuid, email, listOf("ADMIN"))
         }
 
-        val user = userRepository.findUser(email) ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
-        val encodedPassword = userRepository.getEncodedPassword(user.id)
+        val user = userRepository.findByEmail(email) ?: throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
+        val encodedPassword = userRepository.findEncodedPasswordById(user.id)
         if (!passwordEncoder.matches(password, encodedPassword)) {
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         }

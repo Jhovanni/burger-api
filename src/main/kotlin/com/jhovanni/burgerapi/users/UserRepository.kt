@@ -1,7 +1,6 @@
 package com.jhovanni.burgerapi.users
 
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 import java.util.*
 import javax.persistence.*
@@ -9,11 +8,11 @@ import javax.validation.constraints.NotNull
 
 @Repository
 class UserRepository(private val userJpaRepository: UserJpaRepository) {
-    fun findUser(id: UUID): User? {
+    fun findById(id: UUID): User? {
         return userJpaRepository.findById(id).map(::mapToUser).orElseGet { null }
     }
 
-    fun findUser(email: String): User? {
+    fun findByEmail(email: String): User? {
         return userJpaRepository.findOneByEmail(email).map(::mapToUser).orElseGet { null }
     }
 
@@ -23,12 +22,8 @@ class UserRepository(private val userJpaRepository: UserJpaRepository) {
         requireNotNull(userJpa.roles)
     )
 
-    fun exists(email: String): Boolean {
+    fun existsByEmail(email: String): Boolean {
         return userJpaRepository.existsByEmail(email)
-    }
-
-    fun exists(id: UUID): Boolean {
-        return userJpaRepository.existsById(id)
     }
 
     fun save(user: User, encodedPassword: String): User {
@@ -45,13 +40,11 @@ class UserRepository(private val userJpaRepository: UserJpaRepository) {
         return userJpaRepository.findAll().map(::mapToUser)
     }
 
-    fun delete(id: UUID): User? {
-        val userJpa = userJpaRepository.findByIdOrNull(id) ?: return null
-        userJpaRepository.delete(userJpa)
-        return mapToUser(userJpa)
+    fun delete(id: UUID) {
+        userJpaRepository.deleteById(id)
     }
 
-    fun getEncodedPassword(id: UUID): String? {
+    fun findEncodedPasswordById(id: UUID): String? {
         return userJpaRepository.getEncodedPasswordById(id)
     }
 }

@@ -35,7 +35,8 @@ class SecurityConfig {
     @Bean
     fun filterChain(http: HttpSecurity, jwtFilter: JwtFilter): SecurityFilterChain {
         http.csrf().disable()
-            .authorizeRequests()
+            .cors()
+            .and().authorizeRequests()
             .antMatchers(HttpMethod.POST, "/api/v1/auth").permitAll()
             .antMatchers(HttpMethod.GET, "/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .anyRequest().authenticated()

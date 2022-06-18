@@ -4,6 +4,8 @@ import com.jhovanni.burgerapi.users.User
 import com.jhovanni.burgerapi.users.UserRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -41,5 +43,16 @@ class AuthService(
             throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
         }
         return user
+    }
+
+    fun getUserCredentials(): UserCredentials {
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication is UsernamePasswordAuthenticationToken) {
+            val principal = authentication.principal
+            if (principal is UserCredentials) {
+                return principal
+            }
+        }
+        throw ResponseStatusException(HttpStatus.UNAUTHORIZED)
     }
 }

@@ -1,6 +1,6 @@
 package com.jhovanni.burgerapi.users
 
-import com.jhovanni.burgerapi.auth.UserCredentials
+import com.jhovanni.burgerapi.auth.AuthService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
@@ -9,17 +9,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
-import java.security.Principal
 import java.util.*
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
 
 @RestController
 @RequestMapping("/api/v1/users")
-class UserController(private val userService: UserService) {
+class UserController(private val userService: UserService, private val authService: AuthService) {
     @Operation(
         summary = "Create user", security = [SecurityRequirement(name = "Bearer JWT")],
         description = "Requires an admin user",
@@ -133,28 +131,15 @@ class UserController(private val userService: UserService) {
     @PreAuthorize("hasAuthority('ADMIN') || #id == authentication.principal.id")
     fun update(
         @PathVariable id: UUID,
-        @Valid @RequestBody request: UserRequest, principal: Principal
+        @Valid @RequestBody request: UserRequest
     ): UserResponse {
-        val credentials = getCredentials(principal)
+        val credentials = authService.getUserCredentials()
         if (!credentials.roles.contains("ADMIN") && credentials.roles != request.roles.orEmpty()) {
             throw ResponseStatusException(HttpStatus.FORBIDDEN)
         }
 
         val user = userService.update(id, request.email, request.password, request.roles.orEmpty())
         return UserResponse(user)
-    }
-
-    private fun getCredentials(principal: Principal): UserCredentials {
-        if (principal is Authentication) {
-            val innerPrincipal = principal.principal
-            if (innerPrincipal is UserCredentials) {
-                return innerPrincipal
-            } else {
-                throw ResponseStatusException(HttpStatus.FORBIDDEN)
-            }
-        } else {
-            throw ResponseStatusException(HttpStatus.FORBIDDEN)
-        }
     }
 
     @Operation(

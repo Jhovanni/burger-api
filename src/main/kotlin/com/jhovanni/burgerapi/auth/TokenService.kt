@@ -2,6 +2,7 @@ package com.jhovanni.burgerapi.auth
 
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -37,6 +38,8 @@ class TokenService {
             UserCredentials(UUID.fromString(claims.subject), roles)
         } catch (e: ExpiredJwtException) {
             null
+        } catch (e: MalformedJwtException) {
+            return null
         }
     }
 

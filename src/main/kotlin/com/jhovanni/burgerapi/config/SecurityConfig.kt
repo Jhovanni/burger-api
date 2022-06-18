@@ -19,6 +19,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import java.io.Serializable
 import javax.servlet.FilterChain
 import javax.servlet.http.HttpServletRequest
@@ -26,7 +28,12 @@ import javax.servlet.http.HttpServletResponse
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-class SecurityConfig {
+class SecurityConfig : WebMvcConfigurer {
+    override fun addCorsMappings(registry: CorsRegistry) {
+        registry.addMapping("/**").allowedOrigins("*")
+        super.addCorsMappings(registry)
+    }
+
     @Bean
     fun encoder(): PasswordEncoder {
         return BCryptPasswordEncoder()

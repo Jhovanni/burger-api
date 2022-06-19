@@ -12,15 +12,13 @@ class OrderService(private val orderRepository: OrderRepository) {
         return orderRepository.save(order)
     }
 
-    fun getAll(): List<Order> {
-        return orderRepository.getAll()
-    }
+    fun getAll(): List<Order> = orderRepository.getAll()
 
-    fun get(id: UUID): Order {
-        return orderRepository.findById(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
+    fun get(id: UUID): Order = orderRepository.findById(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     fun update(id: UUID, client: String?, items: List<OrderItem>?, status: OrderStatus?): Order {
+        //TODO: should it validate order status change being allowed?
+        //TODO: should it validate products by id exists? if so, what happens if an order is created and later the product is deleted? will it allow to update the order again?
         val existing = get(id)
 
         var processed: Date? = null

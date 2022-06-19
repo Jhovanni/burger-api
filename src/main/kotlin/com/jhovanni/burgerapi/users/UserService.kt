@@ -30,13 +30,9 @@ class UserService(private val userRepository: UserRepository, private val passwo
         return userRepository.save(User(id, email, roles), passwordEncoder.encode(password))
     }
 
-    fun getAll(): List<User> {
-        return userRepository.getAll()
-    }
+    fun getAll(): List<User> = userRepository.getAll()
 
-    fun get(id: UUID): User {
-        return userRepository.findById(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
+    fun get(id: UUID): User = userRepository.findById(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     fun delete(id: UUID): User {
         val user = userRepository.findById(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)

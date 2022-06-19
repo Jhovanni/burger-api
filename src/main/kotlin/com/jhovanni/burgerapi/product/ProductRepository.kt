@@ -13,6 +13,18 @@ import javax.validation.constraints.NotNull
 class ProductRepository(private val productJpaRepository: ProductJpaRepository) {
 
     fun save(product: Product): Product {
+        val productJpa = toProductJpa(product)
+        productJpaRepository.save(productJpa)
+        return product
+    }
+
+    fun findAll(): List<Product> = productJpaRepository.findAll().map(::toProduct)
+
+    fun find(id: UUID): Product? = productJpaRepository.findById(id).map(::toProduct).orElseGet { null }
+
+    fun delete(id: UUID) = productJpaRepository.deleteById(id)
+
+    private fun toProductJpa(product: Product): ProductJpa {
         val productJpa = ProductJpa()
         productJpa.id = product.id
         productJpa.name = product.name
@@ -20,12 +32,7 @@ class ProductRepository(private val productJpaRepository: ProductJpaRepository) 
         productJpa.image = product.image
         productJpa.type = product.type
         productJpa.created = product.created
-        productJpaRepository.save(productJpa)
-        return product
-    }
-
-    fun findAll(): List<Product> {
-        return productJpaRepository.findAll().map(::toProduct)
+        return productJpa
     }
 
     private fun toProduct(productJpa: ProductJpa) = Product(
@@ -36,14 +43,6 @@ class ProductRepository(private val productJpaRepository: ProductJpaRepository) 
         productJpa.type,
         requireNotNull(productJpa.created)
     )
-
-    fun find(id: UUID): Product? {
-        return productJpaRepository.findById(id).map(::toProduct).orElseGet { null }
-    }
-
-    fun delete(id: UUID) {
-        productJpaRepository.deleteById(id)
-    }
 }
 
 interface ProductJpaRepository : JpaRepository<ProductJpa, UUID>

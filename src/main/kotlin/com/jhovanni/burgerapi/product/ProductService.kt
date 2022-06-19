@@ -12,13 +12,10 @@ class ProductService(private val productRepository: ProductRepository) {
         return productRepository.save(product)
     }
 
-    fun getAll(): List<Product> {
-        return productRepository.findAll()
-    }
+    fun getAll(): List<Product> = productRepository.findAll()
 
-    fun get(id: UUID): Product {
-        return productRepository.find(id) ?: throw throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
+    fun get(id: UUID): Product =
+        productRepository.find(id) ?: throw throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     fun update(id: UUID, name: String, price: Float, image: String?, type: String?): Product {
         val existing = get(id)

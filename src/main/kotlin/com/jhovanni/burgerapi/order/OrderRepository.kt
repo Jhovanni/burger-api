@@ -1,6 +1,8 @@
 package com.jhovanni.burgerapi.order
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import java.util.*
@@ -16,6 +18,9 @@ class OrderRepository(private val orderJpaRepository: OrderJpaRepository) {
     }
 
     fun getAll(): List<Order> = orderJpaRepository.findAll().map(::toOrder)
+
+    fun getAll(page: Int, size: Int): List<Order> =
+        orderJpaRepository.findAll(PageRequest.of(page, size)).get().map(::toOrder).toList()
 
     fun findById(id: UUID): Order? = orderJpaRepository.findById(id).map(::toOrder).orElseGet { null }
 

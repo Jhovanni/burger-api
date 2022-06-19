@@ -45,4 +45,6 @@ class OrderService(private val orderRepository: OrderRepository) {
         orderRepository.delete(id)
         return order
     }
+
+    fun getOrders(page: Int, limit: Int): List<Order> = orderRepository.getAll(page, limit)
 }

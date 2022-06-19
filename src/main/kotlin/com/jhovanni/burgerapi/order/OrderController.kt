@@ -2,16 +2,21 @@ package com.jhovanni.burgerapi.order
 
 import com.jhovanni.burgerapi.auth.AuthService
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 import javax.validation.Valid
 
+@Tag(name = "Order API")
 @RestController
 @RequestMapping("/api/v1/orders")
 class OrderController(private val orderService: OrderService, private val authService: AuthService) {
@@ -57,9 +62,18 @@ class OrderController(private val orderService: OrderService, private val authSe
     )
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    fun getAll(): OrdersResponse {
-//        TODO("add pagination")
-        return OrdersResponse(orderService.getAll())
+    fun getAll(
+        @Parameter(description = "Page number to fetch") @RequestParam(defaultValue = "1", required = false) page: Int,
+        @Parameter(description = "Number of elements per page") @RequestParam(
+            defaultValue = "10",
+            required = false
+        ) limit: Int
+    ): OrdersResponse {
+        if (page < 1 || limit < 1) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST)
+        }
+        //TODO: what are the header parameters mentioned in https://laboratoria.github.io/burger-queen-api/module-orders.html
+        return OrdersResponse(orderService.getOrders(page - 1, limit))
     }
 
     @Operation(
@@ -85,7 +99,7 @@ class OrderController(private val orderService: OrderService, private val authSe
     }
 
     @Operation(
-        summary = "Update product", security = [SecurityRequirement(name = "Bearer JWT")],
+        summary = "Update order", security = [SecurityRequirement(name = "Bearer JWT")],
         description = "Requires an admin user. Allows to update only the fields provided.",
         responses = [
             ApiResponse(

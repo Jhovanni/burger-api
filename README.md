@@ -8,6 +8,13 @@ RESTful microservice aligning (mostly) with https://laboratoria.github.io/burger
 
 Developed using Kotlin and Spring framework.
 
+### Testing
+
+There is no unit tests for the project. It is not my practice to do that, but since the project is simple enough and I
+have limited time to work on pet projects, it will need to suffice for now.
+
+Testing has been done via Postman collection.
+
 ### Database
 
 The application is configured to use an SQL database to store data. While developing the app, a Postgresql database has

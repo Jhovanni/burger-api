@@ -12,8 +12,6 @@ class OrderService(private val orderRepository: OrderRepository) {
         return orderRepository.save(order)
     }
 
-    fun getAll(): List<Order> = orderRepository.getAll()
-
     fun get(id: UUID): Order = orderRepository.findById(id) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     fun update(id: UUID, client: String?, items: List<OrderItem>?, status: OrderStatus?): Order {

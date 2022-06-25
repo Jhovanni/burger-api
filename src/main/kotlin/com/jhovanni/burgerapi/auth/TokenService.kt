@@ -17,7 +17,7 @@ class TokenService {
     @Value("\${security.jwt.secret.key}")
     private lateinit var secretKey: String
 
-    fun generate(userCredentials: UserCredentials): String {
+    fun generateToken(userCredentials: UserCredentials): String {
         val issuedMs = System.currentTimeMillis()
         val expirationMs = issuedMs + TOKEN_LIFE_MS
         return Jwts
@@ -30,7 +30,7 @@ class TokenService {
             .compact()
     }
 
-    fun extract(jwtToken: String): UserCredentials? {
+    fun extractCredentials(jwtToken: String): UserCredentials? {
         return try {
             val claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken).body
             val roles =
@@ -45,4 +45,3 @@ class TokenService {
 
 }
 
-data class UserCredentials(val id: UUID, val roles: List<String>)

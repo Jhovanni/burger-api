@@ -22,14 +22,14 @@ class AuthController(private val authService: AuthService) {
     @ApiResponses(
         ApiResponse(
             responseCode = "200",
-            description = "Success authentication",
+            description = "Success",
             content = [(Content(mediaType = "application/json", schema = Schema(implementation = AuthResponse::class)))]
         ),
         ApiResponse(responseCode = "400", description = "Missing required fields", content = [Content()]),
         ApiResponse(responseCode = "401", description = "Unauthorized", content = [Content()])
     )
     @PostMapping
-    fun postAuth(@Valid @RequestBody request: AuthRequest): AuthResponse {
+    fun authenticate(@Valid @RequestBody request: AuthRequest): AuthResponse {
         val token = authService.authenticate(request.email, request.password)
         return AuthResponse(token)
     }

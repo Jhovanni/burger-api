@@ -83,7 +83,7 @@ class JwtFilter(private val tokenService: TokenService) : OncePerRequestFilter()
             return null
         }
         val jwtToken = authorizationHeader.substring(7)
-        return tokenService.extract(jwtToken)
+        return tokenService.extractCredentials(jwtToken)
     }
 
     private fun setCredentials(

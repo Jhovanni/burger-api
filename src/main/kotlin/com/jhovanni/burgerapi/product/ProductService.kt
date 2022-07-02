@@ -7,8 +7,15 @@ import java.util.*
 
 @Service
 class ProductService(private val productRepository: ProductRepository) {
-    fun create(name: String, price: Float, image: String?, type: String?): Product {
-        val product = Product(id = UUID.randomUUID(), name, price, image, type, created = Date())
+    fun create(
+        name: String,
+        description: String?,
+        price: Float,
+        image: String?,
+        type: String?,
+        category: String?
+    ): Product {
+        val product = Product(id = UUID.randomUUID(), name, description, price, image, type, category, created = Date())
         return productRepository.save(product)
     }
 
@@ -17,9 +24,17 @@ class ProductService(private val productRepository: ProductRepository) {
     fun get(id: UUID): Product =
         productRepository.find(id) ?: throw throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
-    fun update(id: UUID, name: String, price: Float, image: String?, type: String?): Product {
+    fun update(
+        id: UUID,
+        name: String,
+        description: String?,
+        price: Float,
+        image: String?,
+        type: String?,
+        category: String?
+    ): Product {
         val existing = get(id)
-        val product = Product(id, name, price, image, type, existing.created)
+        val product = Product(id, name, description, price, image, type, category, existing.created)
         return productRepository.save(product)
     }
 

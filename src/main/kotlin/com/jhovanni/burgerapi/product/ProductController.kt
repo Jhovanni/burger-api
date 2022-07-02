@@ -41,7 +41,14 @@ class ProductController(private val productService: ProductService) {
     @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     fun create(@Valid @RequestBody request: ProductRequest): ProductResponse {
-        val product = productService.create(request.name, request.price, request.image, request.type)
+        val product = productService.create(
+            request.name,
+            request.description,
+            request.price,
+            request.image,
+            request.type,
+            request.category
+        )
         return ProductResponse(product)
     }
 
@@ -116,7 +123,17 @@ class ProductController(private val productService: ProductService) {
         @PathVariable id: UUID,
         @Valid @RequestBody request: ProductRequest
     ): ProductResponse {
-        return ProductResponse(productService.update(id, request.name, request.price, request.image, request.type))
+        return ProductResponse(
+            productService.update(
+                id,
+                request.name,
+                request.description,
+                request.price,
+                request.image,
+                request.type,
+                request.category
+            )
+        )
     }
 
     @Operation(
@@ -139,7 +156,14 @@ class ProductController(private val productService: ProductService) {
     }
 }
 
-data class ProductRequest(val name: String, val price: Float, val image: String?, val type: String?)
+data class ProductRequest(
+    val name: String,
+    val description: String?,
+    val price: Float,
+    val image: String?,
+    val type: String?,
+    val category: String?
+)
 
 data class ProductResponse(val product: Product)
 

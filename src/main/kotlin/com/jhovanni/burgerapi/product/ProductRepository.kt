@@ -28,9 +28,11 @@ class ProductRepository(private val productJpaRepository: ProductJpaRepository) 
         val productJpa = ProductJpa()
         productJpa.id = product.id
         productJpa.name = product.name
+        productJpa.description = product.description
         productJpa.price = product.price
         productJpa.image = product.image
         productJpa.type = product.type
+        productJpa.category = product.category
         productJpa.created = product.created
         return productJpa
     }
@@ -38,8 +40,10 @@ class ProductRepository(private val productJpaRepository: ProductJpaRepository) 
     private fun toProduct(productJpa: ProductJpa) = Product(
         requireNotNull(productJpa.id),
         requireNotNull(productJpa.name),
+        productJpa.description,
         requireNotNull(productJpa.price),
         productJpa.image,
+        productJpa.type,
         productJpa.type,
         requireNotNull(productJpa.created)
     )
@@ -59,6 +63,9 @@ open class ProductJpa {
     open var name: String? = null
 
     @get:Column
+    open var description: String? = null
+
+    @get:Column
     @get:NotNull
     open var price: Float? = null
 
@@ -69,6 +76,11 @@ open class ProductJpa {
     open var type: String? = null
 
     @get:Column
+    open var category: String? = null
+
+    @get:Column
     @get:NotNull
     open var created: Date? = null
+
+
 }

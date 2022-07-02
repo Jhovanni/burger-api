@@ -59,4 +59,3 @@ The following secrets are required
 
 Access swagger documentation using the path /swagger-ui.html. For example: http://localhost:8080/swagger-ui.html (when
 running locally).
-

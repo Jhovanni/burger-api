@@ -44,7 +44,7 @@ class ProductRepository(private val productJpaRepository: ProductJpaRepository) 
         requireNotNull(productJpa.price),
         productJpa.image,
         productJpa.type,
-        productJpa.type,
+        productJpa.category,
         requireNotNull(productJpa.created)
     )
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import java.util.*
 
 private const val ROLES_KEY = "roles"
-private const val TOKEN_LIFE_MS = 600000
+private const val TOKEN_LIFE_MS = 1800000
 private const val ROLES_DELIMITER = ","
 
 @Component

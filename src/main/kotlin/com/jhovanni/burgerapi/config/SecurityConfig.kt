@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfig : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
-        registry.addMapping("/**").allowedOrigins("*")
+        registry.addMapping("/**").allowedOrigins("*").allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
     }
 
     @Bean
